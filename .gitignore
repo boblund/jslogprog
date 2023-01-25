@@ -1,5 +1,13 @@
 old
 trash
 .gitignore
-
 .DS_Store
+bindings-jslogprog.html
+bindings-jslogprog.mjs
+bindings-main.mjs
+old-bindings-jslogprog.js
+old-bindings.html
+initial-jslogprog-main.mjs
+initial-jslogprog.js
+initial-jslogprog.html
+initial-jslogprog.mjs
