@@ -1,5 +1,5 @@
 // Based on: http://tinlizzie.org/ometa/ometa-js-old/prolog-base.js
-export {vars, clause, rule, assert, solve};
+export {vars, clause, rule, solve, Var, assert};
 
 function clause(...args){ return new Clause(...args); }
 function rule(...args){ return new Rule(...args); }
