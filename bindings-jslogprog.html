@@ -1,0 +1,138 @@
+<!-- Based on https://coder-coder.com/display-divs-side-by-side/ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta charset="utf-8">
+    <title>bindings-jslogprog</title>
+
+		<style>
+			.flex-container {
+					display: flex;
+			}
+
+			.flex-child {
+					flex: 1;
+					border: 2px solid white;
+			}  
+
+			.flex-child:first-child {
+					margin-right: 20px;
+			}
+
+			textarea {
+				-moz-tab-size: 2;
+				tab-size: 2;
+			}
+		</style>
+  </head>
+  <body>
+		<div class="flex-container">
+
+			<div class="flex-child">
+				<label for="plInput">JSLogProg Program</label></br>
+				<textarea id="plInput" rows="20" cols="80"></textarea>
+				</br>
+				<button id="runBtn">Run</button>
+				<!--button id="loadBtn" onclick="loadFile()">Load</button-->
+				<button id="loadBtn">Load</button>
+				<!--input id="fileInput" type="file" onchange="readFile(this)" style="display: none;"/-->
+				<input id="fileInput" type="file" style="display: none;"/>
+
+				<button onclick="saveFile()">Save</button>
+			</div> <!-- flex-child -->
+
+			<div class="flex-child">
+				<label for="result">Result</label></br>
+				<textarea id="result" rows="10" cols="60"></textarea>
+			</div> <!-- flex-child -->
+
+		</div> <!-- container-->
+  </body>
+
+	<script type="text/javascript">
+		function dontIndent(str){
+			return ('' + str).replace(/(\n)\s+/g, '$1');
+		}
+
+		let result = document.getElementById('result'),
+			loadBtn = document.getElementById('loadBtn'),
+			fileInput = document.getElementById('fileInput'),
+			plInput = document.getElementById('plInput'),
+			fileName = '';
+		
+		plInput.addEventListener("keydown", (e) => {
+        if (e.keyCode === 9) {
+          e.preventDefault();
+
+          e.currentTarget.setRangeText(
+            "\t",
+            e.currentTarget.selectionStart,
+            e.currentTarget.selectionStart,
+            "end"
+          );
+        }
+      });
+
+		document.getElementById('loadBtn').addEventListener('click', loadFile);
+		document.getElementById('runBtn').addEventListener('click', queryRG);
+		document.getElementById('fileInput').addEventListener('change', readFile);
+
+		function loadFile() {
+			loadBtn.style.display = 'none';
+			fileInput.style.display = '';
+		}
+
+		function readFile(input){
+			let file = input.currentTarget.files[0], //input.files[0],
+				reader = new FileReader();
+
+			fileName = file.name;
+			reader.readAsText(file);
+
+			reader.onload = function() {
+				document.getElementById('plInput').value = reader.result;
+				loadBtn.style.display = '';
+				fileInput.style.display = 'none';
+				reader = null;
+				fileInput.value = null;
+			};
+
+			reader.onerror = function() {
+				console.log(reader.error);
+			};
+		}
+
+		function saveFile(){
+			if (promptFilename = prompt("Save file as:", fileName)) {
+				var textBlob = new Blob([document.getElementById("plInput").value], {type:'text/plain'});
+				var downloadLink = document.createElement("a");
+				downloadLink.download = promptFilename;
+				downloadLink.innerHTML = "Download File";
+				downloadLink.href = window.URL.createObjectURL(textBlob);
+				downloadLink.click();
+				downloadLink = null;
+				textBlob = null;
+			}
+		}
+
+		async function queryRG() {
+			result.innerHTML = '';
+
+			if(document.getElementById('jslprules') != undefined) {
+				document.getElementById('jslprules').remove();
+			}
+
+			const scriptElm = document.createElement('script');
+			scriptElm.setAttribute('id', 'jslprules');
+			scriptElm.setAttribute('type', 'module');
+			var inlineCode = document.createTextNode(
+				'import {vars, clause, rule, assert, solve} from "./bindings-jslogprog.mjs";'
+				+ document.getElementById('plInput').value
+			);
+			scriptElm.appendChild(inlineCode); 
+			document.body.appendChild(scriptElm);
+		}
+  </script>
+</html>
