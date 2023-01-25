@@ -1,16 +1,16 @@
 'use strict';
 
-import {vars, clause, rule, solve} from './autovar-jslogprog.mjs';
+import {vars, clause, rule, solve} from './jslogprog.mjs';
 
 function f(){};
 
 let query = 
 	//clause('father', 'X', 'Y'),
-	//clause('grandfather', 'X', 'Y'),
+	clause('grandfather', 'X', 'Y'),
 	//clause('sibling', 'X', 'Y'),
 	//[clause('isEqual', 'X', 2)], 
 	//clause('isEqual', ['X', ['Y','Z']], [2,[3,f]]),
-	clause('isEqual', ['X', ['Y',{z:'Z'}]], [2,[3,{z:f}]]),
+	//clause('isEqual', ['X', ['Y',{z:'Z'}]], [2,[3,{z:f}]]),
 	//[clause('isEqual', ['X', ['Y',{z:'Z'}]], [2,[3,{z:f}]])],
 	//[clause('father', 'Z', 'X'), clause('father', 'Z', 'Y'), clause('notEqual', 'X', 'Y')],
 	rules = [
