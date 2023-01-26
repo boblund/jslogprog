@@ -186,6 +186,7 @@ function getVars(argArray, r=[]) {
 }
 
 function* solve(userQuery, userRules) {
+	Object.keys(_Vars).forEach(k => delete _Vars[k].binding); // Clear any bindings from previous solve
 	let userQueryVars = userQuery.args ? getVars(userQuery.args) : undefined,
 		stateStack = [new State(userQuery instanceof Array ? {} : userQuery, userQuery instanceof Array ? userQuery : [userQuery], (new Bindings).currentBindings)],
 		rules = userRules.concat(builtinRules);
@@ -197,6 +198,7 @@ function* solve(userQuery, userRules) {
 		bindings = new Bindings(bindings);
 
 		if (goals.length == 0) {
+			// solution
 			yield userQueryVars
 				? userQueryVars.reduce((a,o) => {a[o.name]=bindings.currentBindings[o.name]; return a;}, {})
 				: bindings.currentBindings;
@@ -214,7 +216,7 @@ function* solve(userQuery, userRules) {
 			}catch (e){
 				if(e != "unification failed") console.error('error:', e.message);
 			} finally {
-				goal.args.forEach(arg => {if(arg instanceof Var) delete arg.binding; }); //unbind unified variables
+				Object.keys(bindings.currentBindings).forEach((key) => delete _Vars[key].binding);  //unbind unified variables
 			}
 		});
 	}	

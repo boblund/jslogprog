@@ -69,8 +69,9 @@ console.log("no more solutions");
 // X=lisa, Y=sam
 // no more solutions
 ```
-
 `result` is an object where the keys are Variable names and properties are the solution bindings.
+
+**NOTE** `jslogprog.mjs` defines the notEqual clause. It's inclusion in this example is for illustration.
 
 JSLogProg can be used without rules, clauses and queries. For example:
 
