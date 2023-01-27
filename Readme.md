@@ -77,14 +77,11 @@ The JSLogProg API consists of:
 These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, vars, Var, Bindings}`.
 
 ## `newClause = clause(name, ...arguments)`
-<blockquote>
-
 `newClause` (Clause) instance of Clause
 
 `name` (string) clause name
 
 `arguments` (Var, number, string, function, array, object) clause arguments
-</blockquote>
 
 ## `newRule = rule(head, ...body)`
 `newRule` (Rule) instance of Rule
@@ -94,12 +91,24 @@ These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, va
 `body` (Clause) rule body
 
 ## `solution = solve(query, rules)`
-`solution` (object) solution to query. `solution` keys are query Vars and properties are Var bindings, e.g. `{X: 'abc', Y: 2}`.
+`solution` (object) solution to query. `solution` keys are query Vars and properties are Var bindings, e.g. {X: 'abc', Y: 2}.
 
 `query` (clause | [clause1, ...]) query clause(s).
 
 `rules` (Array) Array of Rules
 
 ## `newVar = new Var(name)`
-`newVar` (Var) instance of Var `{name: 'name' [, binding: varBinding]}`.
+`newVar` (Var) instance of Var.
+
+`name` (String) Var instance name.
+
+`newVar.name` === `name`.
+
+`newVar.binding` is undefined if the Var instance is unbound or else it is a type of string or number or instance of Var, Function, Array or Object.
+
+`binding = newVar.unify(term)` unifies this Var instance with `term` which must be a type of string or number or instance of Var, Function, Array or Object. If unify succeeds `binding` is an object with a key === newVar.name whose property is term. Otherwise a 'unification failed' error is thrown.
+
+`val = newVar.rewrite()` returns the newVar binding if it exists otherwise `newVar.name`. If newVar is bound to an instance of Var then `newVar.binding.rewrite()` is returned. This is applied recursively until a bound Var is found. A side effect is that all traversed Vars will have a binding property equal to `val`. If the chain of Var bindings is circular the `val` is `newVar.name`.
+
+`val = newVar.toAnswerString()` returns `newVar.binding` if newVar is bound otherwise `newVar.name`.
 
