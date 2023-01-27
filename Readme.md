@@ -1,81 +1,50 @@
 # JSLogProg
 
-JSLogProg is an implementation of Prolog-like logic programming in Javascript (JS). It implements Var, Clause, Rule and Query objects for the equivalent Prolog items and implements Prolog unification and goal resolution. JSProlog introduces the following enhancements:
-- Any JavaScript type (number, string, function, array and object) can be a Prolog symbol in a clause.
-- In a clause definition, a JS string starting with an uppercase or underscore is interpreted as a Prolog Variable reference and replaced with a Var object.
-- JS Arrays and Objects are first-class Prolog terms and a Prolog variable can appear as an Array element or Object property.
-- A Prolog clause definition can be implemented with a JS function. For example, the builtin Prolog '=' operator is implemented by the JS function isEqual(a, b) where 'a' and 'b' can be a JS number, string, function, array, object or Prolog Variable.
+JSLogProg is an implementation of Prolog-like logic programming in Javascript (JS). It implements Var, Clause, Rule and Query objects for the equivalent Prolog items and implements Prolog unification and goal resolution.
 
-The following table summarizes the mapping of Prolog elements to JSProlog:
+# JSLogProg Concepts
 
-<table>
-	<tr>
-		<th></th>
-		<th>Prolog</th>
-		<th>JSLogProg</th>
-	</tr>
-	<tr>
-		<td>constant</td>
-		<td>atom, number</td>
-		<td>JavaScript string, number, function, array, object</td>
-	</tr>
-	<tr>
-		<td>variable</td>
-		<td>variable</td>
-		<td>variable</td>
-	</tr>
-	<tr>
-		<td>fact</td>
-		<td>fact</td>
-		<td>fact</td>
-	</tr>
-	<tr>
-		<td>rule</td>
-		<td>rule</td>
-		<td>rule</td>
-	</tr>
-	<tr>
-		<td>query</td>
-		<td>query</td>
-		<td>query</td>
-	</tr>
-</table>
+You can define and run a Prolog-like program in JSLogProg.
+- A JSLogProg *Var* is equivalent to a Prolog variable. A JSLogProg atom can be a JS number, string, function, array or object. Arrays and objects can contain *Vars* as elements and properties, respectively, and may be nested.
+- Unification is defined for *Var* and JS number, string, function, array and object.
+- A JSLogProg program is created using *rule* and *clause* functions.
+- A program is run by defining a *query* and providing it, along with an array of *rules* to a *solve* function, which returns on or more solutions. A solution is a binding of a *query Var* to an atom (JS number, string, function, array or object).
 
-# Use
+Here is an example JSLogProg program:
 ```
-import {vars, clause, rule, solve, Var, assert, Bindings} from './jslogprog.mjs';
+import {rule, clause, solve} from './jslogprog.mjs';
 
-function notEqual([arg1, arg2]) {
-	assert((arg1 instanceof Var ? arg1.binding : arg1.toString()) != (arg2 instanceof Var ? arg2.binding : arg2.toString()));
-	return new Bindings({'X': arg1, 'Y': arg2});
-}
+function g(){console.log('g');};
+function h(){console.log('h');};
 
-clause('sibling', 'X', 'Y');
 const rules = [
-	rule(clause(notEqual, 'X', 'Y')),
-	rule(clause('sibling', 'X', 'Y'), clause('father', 'Z', 'X'), clause('father', 'Z', 'Y'), clause('notEqual', 'X', 'Y')),
-	rule(clause('father', 'homer', 'lisa')),
-	rule(clause('father', 'homer', 'sam'))
+	rule(clause('type1', g)),
+	rule(clause('type2', g)),
+	rule(clause('type2', h)),
+	rule(clause('type3', [1,2,3])),
+	rule(clause('type4', {key: 'value'})),
+	rule(clause('type5', 'abc'))
 ];
 
-console.log('query: ', query.toAnswerString());
-for (const result of solve(query, rules)){
-	let a = Object.keys(result).length === 0 ? 'true' : 'yes: ';
-	console.log(Object.entries(result).reduce((a, e) => a += `${e[0]}=${e[1].toAnswerString()}, `, a).replace(/, $/,''));
-}
-console.log("no more solutions");
-// query:  sibling(X, Y)
-// X=sam, Y=lisa
-// X=lisa, Y=sam
-// no more solutions
-```
-`result` is an object where the keys are Variable names and properties are the solution bindings.
+const query = clause('type2', 'X');
 
-**NOTE** `jslogprog.mjs` defines the notEqual clause. It's inclusion in this example is for illustration.
+for (const solution of solve(query, rules)){
+	console.log(`solution: ${solution.toAnswerString()}`);
+	console.log(solution.X());
+}
+console.log ('No more solutions');
+
+// solution: '{ X: Function g }'
+// 'g'
+// solution: '{ X: Function h }'
+// 'h'
+// No more solutions
+```
 
 JSLogProg can be used without rules, clauses and queries. For example:
-
 ```
+import {vars} from './jslogprog.mjs';
+
 let [W, X, Y, Z] = vars('W', 'X', 'Y', 'Z'); // define Variables W, X, Y and Z
 try{
 	let o = [1,{a:W, b:15},3];
@@ -90,3 +59,47 @@ try{
 	e === "unification failed"
 }
 ```
+JSLogProg unification is straightforward:
+- A Variable unifies with Variable, number, string, function, array, object
+- A number unifies with the same number
+- A string unifies with the same string or a function where function.name === string
+- A function unifies with the same function
+- An array unifies with an array of the same length and where the array elements unify
+- An object unifies with an object with the same keys and where the object properties unify
+
+# JSLogProg API
+
+The JSLogProg API consists of:
+- `clause`, `rule`, and `solve` for creating and running JSLogProg programs.
+- `Var` and `vars` for creating JSLogProg variables.
+- Common JSLogProg methods for JSLogProg terms (Var, number, string, function, array and object) for unification and output.
+
+These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, vars, Var, Bindings}`.
+
+## `newClause = clause(name, ...arguments)`
+<blockquote>
+
+`newClause` (Clause) instance of Clause
+
+`name` (string) clause name
+
+`arguments` (Var, number, string, function, array, object) clause arguments
+</blockquote>
+
+## `newRule = rule(head, ...body)`
+`newRule` (Rule) instance of Rule
+
+`head` (Clause) rule head
+
+`body` (Clause) rule body
+
+## `solution = solve(query, rules)`
+`solution` (object) solution to query. `solution` keys are query Vars and properties are Var bindings, e.g. `{X: 'abc', Y: 2}`.
+
+`query` (clause | [clause1, ...]) query clause(s).
+
+`rules` (Array) Array of Rules
+
+## `newVar = new Var(name)`
+`newVar` (Var) instance of Var `{name: 'name' [, binding: varBinding]}`.
+
