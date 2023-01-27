@@ -148,7 +148,7 @@ The `Bindings` class defines the behavior for JSLogProg variable bindings.
 ## `Array`
 The `Array` prototype is extended with `unify`, `rewrite` and `toAnswerString` methods to integrate these types with JSLogProg.
 
-`let binding = <instance of Array>.unify(term)` Unifies if `term` is an array of the same length and elements of `term` unify with this array. Otherwise throws a 'unification failed' error.
+`let binding = <instance of Array>.unify(term)` Unifies if `term` is an array of the same length and elements of `term` unify with elements of this array. Otherwise throws a 'unification failed' error.
 
 `let val = [<instance of Array>.rewrite()` returns a new array where each element in this array is rewrittem.
 
@@ -157,7 +157,7 @@ The `Array` prototype is extended with `unify`, `rewrite` and `toAnswerString` m
 ## `Object`
 The `Object` prototype is extended with `unify`, `rewrite` and `toAnswerString` methods to integrate these types with JSLogProg.
 
-`let binding = <instance of Object>.unify(term)` Unifies if `term` is an object with the same keys and properties of `term` unify with this object. Otherwise throws a 'unification failed' error.
+`let binding = <instance of Object>.unify(term)` Unifies if `term` is an object with the same keys, and properties of `term` unify with the properties of this object. Otherwise throws a 'unification failed' error.
 
 `let val = [<instance of Object>.rewrite()` returns a new object where each property in this object is rewrittem.
 
