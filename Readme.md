@@ -106,7 +106,8 @@ These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, va
 
 `newVar.binding` is undefined if the Var instance is unbound or else it is a type of string or number or instance of Var, Function, Array or Object.
 
-`binding = newVar.unify(term)` unifies this Var instance with `term` which must be a type of string or number or instance of Var, Function, Array or Object. If unify succeeds `binding` is an object with a key === newVar.name whose property is term. Otherwise a 'unification failed' error is thrown.
+### `binding = newVar.unify(term)`
+Unifies this Var instance with `term` which must be a type of string or number or instance of Var, Function, Array or Object. If unify succeeds `binding` is an object with a key === newVar.name whose property is term. Otherwise a 'unification failed' error is thrown.
 
 `val = newVar.rewrite()` returns the newVar binding if it exists otherwise `newVar.name`. If newVar is bound to an instance of Var then `newVar.binding.rewrite()` is returned. This is applied recursively until a bound Var is found. A side effect is that all traversed Vars will have a binding property equal to `val`. If the chain of Var bindings is circular the `val` is `newVar.name`.
 
