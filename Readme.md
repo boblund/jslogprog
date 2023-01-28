@@ -2,7 +2,13 @@
 
 JSLogProg is an implementation of Prolog-like logic programming in Javascript (JS). It implements Var, Clause, Rule and Query objects for the equivalent Prolog items and implements Prolog unification and goal resolution.
 
-# JSLogProg Concepts
+[Concepts](#concepts)
+
+[API](#api)
+
+
+
+# JSLogProg Concepts <a name="concepts"></a>
 
 You can define and run a Prolog-like program in JSLogProg.
 - A JSLogProg *Var* is equivalent to a Prolog variable. A JSLogProg atom can be a JS number, string, function, array or object. Arrays and objects can contain *Vars* as elements and properties, respectively, and may be nested.
@@ -67,7 +73,7 @@ JSLogProg unification is straightforward:
 - An array unifies with an array of the same length and where the array elements unify
 - An object unifies with an object with the same keys and where the object properties unify
 
-# JSLogProg API
+# JSLogProg API <a name="api"></a>
 
 The JSLogProg API consists of:
 - `clause`, `rule`, and `solve` for creating and running JSLogProg programs.
