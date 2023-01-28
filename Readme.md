@@ -4,9 +4,13 @@ JSLogProg is an implementation of Prolog-like logic programming in Javascript (J
 
 [Concepts](#concepts)
 
+[Using](#using)
+
+[Builtin Operations](#builtins)
+
+[Native Rules](#nativerules)
+
 [API](#api)
-
-
 
 # JSLogProg Concepts <a name="concepts"></a>
 
@@ -41,9 +45,7 @@ for (const solution of solve(query, rules)){
 console.log ('No more solutions');
 
 // solution: '{ X: Function g }'
-// 'g'
 // solution: '{ X: Function h }'
-// 'h'
 // No more solutions
 ```
 
@@ -73,6 +75,68 @@ JSLogProg unification is straightforward:
 - An array unifies with an array of the same length and where the array elements unify
 - An object unifies with an object with the same keys and where the object properties unify
 
+# Using <a name="using"></a>
+
+```
+git clone git@github.com:boblund/jslogprog.git
+
+cd jslogprog
+```
+
+JSLogProg can be used in Node JS or a web site.
+
+## Node JS
+
+```
+[TRACE=true] node jslogprog.mjs
+```
+
+Setting `TRACE=true` will output the state stack (current list of goals and bindings) and rule/goal unification as the rules are searched for query solutions.
+
+## Web Site
+
+jslogprog.mjs is a module which can be imported in a web page. For example:
+
+```
+<html>
+	<body>
+	</body>
+	<script type="module">
+		import {vars, clause, rule, solve} from './jslogprog.mjs';
+		.
+		.
+		.
+	</script>
+</html>
+```
+
+The file doing the import must be served by an https web site. [localAwsApiGw](https://github.com/boblund/localAwsApiGw) is one option for setting up a such a server.
+
+The web page jslogprog.html in this repo uses jslogprog.mjs to provide a playground for experimenting with JSLogProg. Load the jslogprog-browser-example and click run to see it in action.
+
+# Builtin Operations <a name="builtins"></a>
+
+JSLogProg has a limited set of builtin Prolog operations: '=' and '!='. These are implemented as [native rules](#nativerules).
+
+`isEqual(X, Y)`
+
+`notEqual(X, Y)`
+
+# Native Rules <a name="nativerules"></a>
+
+A rule can be defined that calls a JS function. This is useful for implementing builtin Prolog predicates, '=' for example:
+
+```
+rule(clause(
+	function isEqual([arg1, arg2]) {
+		return arg1.unify(arg2);
+	},
+	'X', 'Y'
+))
+```
+
+This rule is referenced in a goal via the function's name, i.e. `clause('isEual', X, 2))`. Clause arguments are referenced from an array. The JS function is expected bind any appropriate variables and return a bindings object. Failure to must result in throwing a 'unification failed' error.
+
 # JSLogProg API <a name="api"></a>
 
 The JSLogProg API consists of:
@@ -80,7 +144,7 @@ The JSLogProg API consists of:
 - `Var` and `vars` for creating JSLogProg variables.
 - Common JSLogProg methods for JSLogProg terms (Var, number, string, function, array and object) for unification and output.
 
-These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, vars, Var, Bindings}`.
+These are accessed via the jslogprog.mjs exports `{vars, clause, rule, solve, Var, Bindings, assert}`.
 
 ## `newClause = clause(name, ...arguments)`
 The clause function returns an instance of `Clause` with the `name` and `arguments`. It is a convenience function that replaces `new Clause`. Variables in `arguments` can be instances of `Var`. Or, they can be denoted by strings that begin with '_' or an uppercase letter, i.e. the Prolog convention for variable names.
@@ -104,7 +168,13 @@ The rule function returns an instance of `Rule` with the `head` and `body`. It i
 The vars function returns new variable instances whose names are `arguments`. A single new variable instance is returned if arguments is a single name. Otherwise an array of new variable instances is returned. It is a convenience function that replaces ```new Var```.
 
 ## `solution = solve(query, rules)`
-`solution` (object) solution to query. `solution` keys are query Vars and properties are Var bindings, e.g. {X: 'abc', Y: 2}.
+`solve` is a generator that yields the next `solution` (object) for query on every call. `solution` keys are query Vars and properties are Var bindings, e.g. {X: 'abc', Y: 2}. It returns when no more solutions are found. The general structure of its use is:
+```
+for(const solution of solve(query, rules)) {
+	// do something with the solution
+}
+// no more solutions
+```
 
 `query` (clause | [clause1, ...]) query clause(s).
 
@@ -141,6 +211,9 @@ The `Bindings` class defines the behavior for JSLogProg variable bindings.
 
 ### Methods
 `bindings.add(moreBindings)` Adds `moreBindings`, an object of variable bindings, e.g {X:'a', Y:2}, to this object's currentBindings property. Properties of duplicate keys in `moreBindings` overwrite those in currentBindings.
+
+## `assert(condition)`
+`assert` is called as part of unification. `condition` is a boolean that if false ends this, and all subsequent, unification by throwing a 'unification failed' error.
 
 ## `String`, `Number`, `Function`
 `String`, `Number` and `Function` prototypes are extended with `unify`, `rewrite` and `toAnswerString` methods to integrate these types with JSLogProg.
