@@ -128,14 +128,14 @@ A rule can be defined that calls a JS function. This is useful for implementing 
 
 ```
 rule(clause(
-	function isEqual([arg1, arg2]) {
-		return arg1.unify(arg2);
-	},
-	'X', 'Y'
+  function isEqual([arg1, arg2]) {
+    return arg1.unify(arg2);
+  },
+  'X', 'Y'
 ))
 ```
 
-This rule is referenced in a goal via the function's name, i.e. `clause('isEual', X, 2))`. Clause arguments are referenced from an array. The JS function is expected bind any appropriate variables and return a bindings object. Failure to must result in throwing a 'unification failed' error.
+This rule is referenced in a goal via the function's name, i.e. `clause('isEual', X, 2))`. Clause arguments are referenced from an array. The JS function is expected to bind any appropriate variables and return a bindings object. Failure to unify must result in throwing a 'unification failed' error.
 
 # JSLogProg API <a name="api"></a>
 
