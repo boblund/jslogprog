@@ -32,7 +32,7 @@ Number.prototype.toAnswerString = function() {return this;};
 Number.prototype.unify = function(that) { return that instanceof Var ? that.unify(this) : assert(this === that); };
 
 String.prototype.rewrite = function() {return this;};
-String.prototype.toAnswerString = function() {return `'${this}'`;};
+String.prototype.toAnswerString = function() {return `${this}`;};
 String.prototype.unify = function(that) {
 	return that instanceof Var ? that.unify(this) : assert(this.toString() === (that instanceof Function ? that.name : that.toString()));
 };
@@ -70,7 +70,7 @@ Object.prototype.unify = function(object) {
 };
 
 function Var(name) { this.name = name; }
-Var.prototype.toAnswerString = function() { return (this.binding && !(this.binding instanceof Var)) ? this.binding : this.name; };
+Var.prototype.toAnswerString = function() { return (this.binding && !(this.binding instanceof Var)) ? this.binding.toAnswerString() : this.name; };
 Var.prototype.rewrite = function(root=this) {
 	return  this.binding
 		? this.binding instanceof Var
@@ -107,7 +107,10 @@ function mapVars(arg){
 		case arg instanceof Array:
 			return arg.map(aEntry => mapVars(aEntry));
 
-		case !(arg instanceof Var) && (arg instanceof Object):
+		case arg instanceof Var:
+			return (_Vars[arg.name] = arg);
+
+		case /*!(arg instanceof Var) &&*/ (arg instanceof Object):
 			Object.keys(arg).forEach(key => arg[key] = mapVars(arg[key]));
 			return arg;
 

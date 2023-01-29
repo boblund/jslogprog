@@ -2,14 +2,16 @@
 
 import {vars, clause, rule, solve} from './jslogprog.mjs';
 
-function f(){};
+function f(a){console.log(a);};
+let [A, B] = vars('A', 'B');
 
 let query = 
+	clause('father', A, B),
 	//clause('father', 'X', 'Y'),
 	//clause('grandfather', 'X', 'Y'),
 	//clause('sibling', 'X', 'Y'),
 	//[clause('isEqual', 'X', 2)], 
-	clause('isEqual', ['X', ['Y','Z']], [2,[3,f]]),
+	//clause('isEqual', ['X', ['Y','Z']], [2,[3,f]]),
 	//clause('isEqual', ['X', ['Y',{z:'Z'}]], [2,[3,{z:f}]]),
 	//[clause('isEqual', ['X', ['Y',{z:'Z'}]], [2,[3,{z:f}]])],
 	//[clause('father', 'Z', 'X'), clause('father', 'Z', 'Y'), clause('notEqual', 'X', 'Y')],
@@ -28,17 +30,17 @@ for (const result of solve(query, rules)){
 }
 console.log("no more solutions");
 
-/*let [X, Y, Z] = vars('X', 'Y', 'Z');
+let [X, Y, Z] = vars('X', 'Y', 'Z');
 try{
 	let o = [1,{a:Y, b:15},3];
 	//Y.unify(10);
 	console.log(o.rewrite().toAnswerString());
-	X.unify(Y);
+	let b = X.unify(Y);
 	Y.unify(Z);
 	Z.unify(X);
-	//Z.unify(5);
+	Z.unify(f);
 	console.log(X.rewrite());
 	console.log(X.toAnswerString());
 } catch(e) {
 	console.log(e === 'unification failed' ? e : e.message);
-}*/
+}
